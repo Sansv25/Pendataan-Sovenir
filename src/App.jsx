@@ -19,6 +19,9 @@ export default function App() {
   });
 
   const [stokList, setStokList] = useState([]);
+  const [spreadsheetUrl, setSpreadsheetUrl] = useState(() => {
+    return localStorage.getItem('sovenir_spreadsheet_url') || import.meta.env.VITE_SPREADSHEET_URL || '';
+  });
   const [loadingStok, setLoadingStok] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -26,8 +29,12 @@ export default function App() {
   const fetchStokData = useCallback(async (showNotificationOnError = false) => {
     setLoadingStok(true);
     try {
-      const data = await getStok();
-      setStokList(data);
+      const res = await getStok();
+      setStokList(res.data || []);
+      if (res.spreadsheetUrl) {
+        setSpreadsheetUrl(res.spreadsheetUrl);
+        localStorage.setItem('sovenir_spreadsheet_url', res.spreadsheetUrl);
+      }
     } catch (err) {
       console.error('Gagal memuat data stok:', err);
       if (showNotificationOnError) {
@@ -241,6 +248,7 @@ export default function App() {
             onRefresh={() => fetchStokData(true)}
             onBack={() => navigateTo('beranda')}
             onAddJenis={handleSubmitTransaksi}
+            spreadsheetUrl={spreadsheetUrl}
           />
         )}
       </main>

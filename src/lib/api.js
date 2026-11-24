@@ -34,7 +34,10 @@ export async function getStok() {
       throw new Error(json.message || 'Gagal mengambil data dari Google Sheets.');
     }
 
-    return json.data || [];
+    return {
+      data: json.data || [],
+      spreadsheetUrl: json.spreadsheetUrl || '',
+    };
   } catch (err) {
     console.error('Error saat fetch getStok:', err);
     throw new Error(err.message || 'Gagal terhubung ke server Apps Script.');
@@ -42,7 +45,7 @@ export async function getStok() {
 }
 
 /**
- * Mengirim transaksi (Pengambilan, Pengembalian, atau Stok Masuk) ke Apps Script (doPost)
+ * Mengirim transaksi (Pengambilan, Pengembalian, Stok Masuk, atau Tambah Jenis) ke Apps Script (doPost)
  * Menggunakan Content-Type: text/plain untuk menghindari preflight CORS
  */
 export async function kirimTransaksi(payload) {

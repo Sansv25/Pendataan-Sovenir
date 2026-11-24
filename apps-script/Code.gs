@@ -74,6 +74,7 @@ function doGet(e) {
     return jsonResponse({
       success: true,
       data: data,
+      spreadsheetUrl: ss.getUrl(),
       timestamp: new Date().toISOString()
     });
 
