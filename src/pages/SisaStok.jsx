@@ -3,11 +3,12 @@ import { BackButton } from '../components/Form';
 import TabelStok from '../components/TabelStok';
 import ModalTambahJenis from '../components/ModalTambahJenis';
 import Swal from 'sweetalert2';
+import { toastSuccess } from '../lib/alert';
 
 /**
  * Halaman Sisa Stok
  * Menampilkan tabel/kartu sisa stok per jenis sovenir, kolom pencarian, status, foto,
- * tombol Tambah Jenis Sovenir, dan Tombol Buka Spreadsheet.
+ * tombol Tambah Jenis Sovenir, dan Tombol Buka/Ubah Spreadsheet.
  */
 export default function SisaStok({
   stokList = [],
@@ -36,38 +37,49 @@ export default function SisaStok({
     }
   };
 
-  const handleOpenSpreadsheet = async () => {
-    let targetUrl = spreadsheetUrl || initialSpreadsheetUrl;
+  // Fungsi untuk mengubah / mengoreksi link Google Sheets
+  const handleEditSpreadsheetUrl = async () => {
+    const currentUrl = spreadsheetUrl || localStorage.getItem('sovenir_spreadsheet_url') || '';
+    
+    const { value: urlInput } = await Swal.fire({
+      title: 'Ubah Link Spreadsheet',
+      text: 'Masukkan link Google Sheets yang benar:',
+      input: 'url',
+      inputValue: currentUrl,
+      inputPlaceholder: 'https://docs.google.com/spreadsheets/d/...',
+      showCancelButton: true,
+      confirmButtonText: 'Simpan',
+      cancelButtonText: 'Batal',
+      confirmButtonColor: '#059669',
+      customClass: {
+        popup: 'rounded-2xl font-sans',
+        confirmButton: 'px-5 py-2.5 rounded-xl font-semibold',
+        cancelButton: 'px-5 py-2.5 rounded-xl font-semibold',
+      },
+    });
 
-    if (!targetUrl) {
-      const { value: urlInput } = await Swal.fire({
-        title: 'Tautan Google Spreadsheet',
-        text: 'Masukkan tautan (link) Google Sheets Anda:',
-        input: 'url',
-        inputPlaceholder: 'https://docs.google.com/spreadsheets/d/...',
-        showCancelButton: true,
-        confirmButtonText: 'Simpan & Buka',
-        cancelButtonText: 'Batal',
-        confirmButtonColor: '#059669',
-        customClass: {
-          popup: 'rounded-2xl font-sans',
-          confirmButton: 'px-5 py-2.5 rounded-xl font-semibold',
-          cancelButton: 'px-5 py-2.5 rounded-xl font-semibold',
-        },
-      });
-
-      if (urlInput) {
-        targetUrl = urlInput.trim();
-        setSpreadsheetUrl(targetUrl);
-        localStorage.setItem('sovenir_spreadsheet_url', targetUrl);
+    if (urlInput !== undefined) {
+      const trimmed = urlInput.trim();
+      setSpreadsheetUrl(trimmed);
+      if (trimmed) {
+        localStorage.setItem('sovenir_spreadsheet_url', trimmed);
+        toastSuccess('Link Spreadsheet berhasil diperbarui!');
       } else {
-        return;
+        localStorage.removeItem('sovenir_spreadsheet_url');
+        toastSuccess('Link Spreadsheet dihapus.');
       }
     }
+  };
 
-    if (targetUrl) {
-      window.open(targetUrl, '_blank', 'noopener,noreferrer');
+  const handleOpenSpreadsheet = async () => {
+    let targetUrl = spreadsheetUrl || localStorage.getItem('sovenir_spreadsheet_url') || initialSpreadsheetUrl;
+
+    if (!targetUrl) {
+      handleEditSpreadsheetUrl();
+      return;
     }
+
+    window.open(targetUrl, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -77,17 +89,27 @@ export default function SisaStok({
         <BackButton onBack={onBack} />
 
         <div className="flex items-center gap-2">
-          {/* Tombol Buka Spreadsheet */}
-          <button
-            type="button"
-            onClick={handleOpenSpreadsheet}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 active:bg-emerald-200 text-emerald-800 text-sm font-semibold transition shadow-sm mb-3"
-            title="Buka Spreadsheet di Google Sheets"
-          >
-            <span className="material-symbols-outlined text-lg text-emerald-600">table_view</span>
-            <span>Buka Spreadsheet</span>
-            <span className="material-symbols-outlined text-sm text-emerald-600">open_in_new</span>
-          </button>
+          {/* Group Tombol Buka & Edit Spreadsheet */}
+          <div className="inline-flex items-center rounded-xl border border-emerald-300 bg-emerald-50 shadow-sm mb-3 overflow-hidden">
+            <button
+              type="button"
+              onClick={handleOpenSpreadsheet}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 hover:bg-emerald-100 active:bg-emerald-200 text-emerald-800 text-sm font-semibold transition"
+              title="Buka Spreadsheet di Google Sheets"
+            >
+              <span className="material-symbols-outlined text-lg text-emerald-600">table_view</span>
+              <span>Buka Spreadsheet</span>
+              <span className="material-symbols-outlined text-sm text-emerald-600">open_in_new</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleEditSpreadsheetUrl}
+              className="px-2 py-2 border-l border-emerald-200 hover:bg-emerald-100 active:bg-emerald-200 text-emerald-700 transition"
+              title="Ganti / Edit Link Spreadsheet"
+            >
+              <span className="material-symbols-outlined text-base">edit</span>
+            </button>
+          </div>
 
           {/* Tombol Tambah Jenis Sovenir */}
           <button
