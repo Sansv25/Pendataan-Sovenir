@@ -5,7 +5,33 @@
  * FOLDER_ID_FOTO_BUKTI: Folder tempat menyimpan foto bukti & foto sovenir di Drive.
  */
 
-const FOLDER_ID_FOTO_BUKTI = "GANTI_DENGAN_FOLDER_ID_DRIVE_ANDA";
+const FOLDER_ID_FOTO_BUKTI = "1rsjH7VrZHdeXnrvmBhxN0_rVbNjUt55r";
+
+/**
+ * Helper: Memastikan rumus otomatis SUMIFS selalu terisi di tab Sisa Stok
+ * Jika kolom B s.d F kosong, fungsi ini akan otomatis mengisinya dengan rumus.
+ */
+function ensureFormulas(sheetStok) {
+  try {
+    const lastRow = Math.min(Math.max(sheetStok.getLastRow(), 2), 101);
+    for (let r = 2; r <= lastRow; r++) {
+      const jenis = sheetStok.getRange(r, 1).getValue();
+      if (!jenis || String(jenis).trim() === "") continue;
+
+      const formulaB = sheetStok.getRange(r, 2).getFormula();
+      if (!formulaB) {
+        sheetStok.getRange(r, 2).setFormula('=IF($A' + r + '="","",SUMIFS(\'Stok Masuk\'!$C$2:$C$1000,\'Stok Masuk\'!$B$2:$B$1000,$A' + r + '))');
+        sheetStok.getRange(r, 3).setFormula('=IF($A' + r + '="","",SUMIFS(Pengambilan!$C$2:$C$1000,Pengambilan!$B$2:$B$1000,$A' + r + '))');
+        sheetStok.getRange(r, 4).setFormula('=IF($A' + r + '="","",SUMIFS(Pengembalian!$C$2:$C$1000,Pengembalian!$B$2:$B$1000,$A' + r + '))');
+        sheetStok.getRange(r, 5).setFormula('=IF($A' + r + '="","",B' + r + '-C' + r + '+D' + r + ')');
+        sheetStok.getRange(r, 6).setFormula('=IF($A' + r + '="","",IF(E' + r + '<0,"Cek data",IF(E' + r + '=0,"Habis","Tersedia")))');
+      }
+    }
+    SpreadsheetApp.flush();
+  } catch (err) {
+    Logger.log("ensureFormulas error: " + err.toString());
+  }
+}
 
 /**
  * Handle GET requests
@@ -13,7 +39,6 @@ const FOLDER_ID_FOTO_BUKTI = "GANTI_DENGAN_FOLDER_ID_DRIVE_ANDA";
  */
 function doGet(e) {
   try {
-    SpreadsheetApp.flush();
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const sheetStok = ss.getSheetByName("Sisa Stok");
     
@@ -24,12 +49,17 @@ function doGet(e) {
       });
     }
 
+    // Pastikan rumus di tab Sisa Stok sudah terpasang
+    ensureFormulas(sheetStok);
+    SpreadsheetApp.flush();
+
     // Baca data dari baris 2 hingga 101 (maks 100 jenis sovenir)
     const lastRow = Math.min(sheetStok.getLastRow(), 101);
     if (lastRow < 2) {
       return jsonResponse({
         success: true,
-        data: []
+        data: [],
+        spreadsheetUrl: ss.getUrl()
       });
     }
 
@@ -115,9 +145,6 @@ function doPost(e) {
     const action = String(payload.action || payload.type || "").toLowerCase().trim();
     const ss = SpreadsheetApp.getActiveSpreadsheet();
 
-    // Pastikan rumus di Sheets terbaru
-    SpreadsheetApp.flush();
-
     const sheetStok = ss.getSheetByName("Sisa Stok");
     if (!sheetStok) {
       return jsonResponse({
@@ -125,6 +152,9 @@ function doPost(e) {
         message: "Tab 'Sisa Stok' tidak ditemukan."
       });
     }
+
+    // Pastikan rumus otomatis selalu ada di tab Sisa Stok
+    ensureFormulas(sheetStok);
 
     // -------------------------------------------------------------
     // AKSI 1: TAMBAH JENIS SOVENIR BARU (LANGSUNG DARI WEB)
@@ -168,8 +198,14 @@ function doPost(e) {
         fotoUrl = simpanFotoDrive(payload.foto, "sovenir", namaJenisBaru);
       }
 
-      // Tulis ke kolom A dan kolom G
+      // Tulis nama jenis ke kolom A, pasang rumus ke B..F, dan foto ke G
       sheetStok.getRange(targetRow, 1).setValue(namaJenisBaru);
+      sheetStok.getRange(targetRow, 2).setFormula('=IF($A' + targetRow + '="","",SUMIFS(\'Stok Masuk\'!$C$2:$C$1000,\'Stok Masuk\'!$B$2:$B$1000,$A' + targetRow + '))');
+      sheetStok.getRange(targetRow, 3).setFormula('=IF($A' + targetRow + '="","",SUMIFS(Pengambilan!$C$2:$C$1000,Pengambilan!$B$2:$B$1000,$A' + targetRow + '))');
+      sheetStok.getRange(targetRow, 4).setFormula('=IF($A' + targetRow + '="","",SUMIFS(Pengembalian!$C$2:$C$1000,Pengembalian!$B$2:$B$1000,$A' + targetRow + '))');
+      sheetStok.getRange(targetRow, 5).setFormula('=IF($A' + targetRow + '="","",B' + targetRow + '-C' + targetRow + '+D' + targetRow + ')');
+      sheetStok.getRange(targetRow, 6).setFormula('=IF($A' + targetRow + '="","",IF(E' + targetRow + '<0,"Cek data",IF(E' + targetRow + '=0,"Habis","Tersedia")))');
+
       if (fotoUrl) {
         sheetStok.getRange(targetRow, 7).setValue(fotoUrl);
       }
@@ -210,7 +246,7 @@ function doPost(e) {
 
     let stokItem = stokMap[jenisInput.toLowerCase()];
 
-    // Jika pada Stok Masuk jenis belum ada, otomatis daftarkan ke tab Sisa Stok
+    // Jika pada Stok Masuk jenis belum ada, otomatis daftarkan ke tab Sisa Stok beserta rumusnya
     if (!stokItem && (action === "stok_masuk" || action === "stokmasuk")) {
       const colAValues = sheetStok.getRange(2, 1, 100, 1).getValues();
       let targetRow = -1;
@@ -223,6 +259,11 @@ function doPost(e) {
       }
       if (targetRow !== -1) {
         sheetStok.getRange(targetRow, 1).setValue(jenisInput);
+        sheetStok.getRange(targetRow, 2).setFormula('=IF($A' + targetRow + '="","",SUMIFS(\'Stok Masuk\'!$C$2:$C$1000,\'Stok Masuk\'!$B$2:$B$1000,$A' + targetRow + '))');
+        sheetStok.getRange(targetRow, 3).setFormula('=IF($A' + targetRow + '="","",SUMIFS(Pengambilan!$C$2:$C$1000,Pengambilan!$B$2:$B$1000,$A' + targetRow + '))');
+        sheetStok.getRange(targetRow, 4).setFormula('=IF($A' + targetRow + '="","",SUMIFS(Pengembalian!$C$2:$C$1000,Pengembalian!$B$2:$B$1000,$A' + targetRow + '))');
+        sheetStok.getRange(targetRow, 5).setFormula('=IF($A' + targetRow + '="","",B' + targetRow + '-C' + targetRow + '+D' + targetRow + ')');
+        sheetStok.getRange(targetRow, 6).setFormula('=IF($A' + targetRow + '="","",IF(E' + targetRow + '<0,"Cek data",IF(E' + targetRow + '=0,"Habis","Tersedia")))');
         SpreadsheetApp.flush();
         stokItem = {
           jenisExact: jenisInput,
