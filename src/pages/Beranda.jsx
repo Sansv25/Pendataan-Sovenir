@@ -18,8 +18,8 @@ export default function Beranda({ onNavigate, totalJenis = 0, isAdmin = false, o
     },
     {
       id: 'pengembalian',
-      title: 'Pengeluaran Sovenir',
-      desc: 'Catat pengeluaran atau pengembalian sovenir',
+      title: 'Pengembalian Sovenir',
+      desc: 'Catat sovenir sisa event yang dikembalikan',
       badge: 'Masuk',
       iconName: 'input',
       iconBg: 'bg-emerald-50 text-emerald-600',

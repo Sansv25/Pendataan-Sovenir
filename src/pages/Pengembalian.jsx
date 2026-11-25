@@ -99,12 +99,12 @@ export default function Pengembalian({ stokList = [], onBack, onSubmit, loading 
       <BackButton onBack={onBack} />
 
       <FormCard
-        title="Pengeluaran Sovenir"
-        subtitle="Catat pengeluaran atau pengembalian sovenir kegiatan"
+        title="Pengembalian Sovenir"
+        subtitle="Catat pengembalian sovenir sisa kegiatan ke dalam stok"
         onSubmit={handleSubmit}
       >
         {/* Nama */}
-        <FormField label="Nama Pengeluar / Pengembali" required error={errors.nama}>
+        <FormField label="Nama Pengembali" required error={errors.nama}>
           <input
             type="text"
             value={formData.nama}
@@ -132,8 +132,8 @@ export default function Pengembalian({ stokList = [], onBack, onSubmit, loading 
           </select>
         </FormField>
 
-        {/* Jumlah Pengeluaran */}
-        <FormField label="Jumlah (pcs)" required error={errors.jumlah}>
+        {/* Jumlah Pengembalian */}
+        <FormField label="Jumlah Pengembalian (pcs)" required error={errors.jumlah}>
           <input
             type="number"
             min="1"
@@ -141,13 +141,13 @@ export default function Pengembalian({ stokList = [], onBack, onSubmit, loading 
             value={formData.jumlah}
             onChange={(e) => handleChange('jumlah', e.target.value)}
             disabled={loading}
-            placeholder="Masukkan jumlah yang dicatat"
+            placeholder="Masukkan jumlah yang dikembalikan"
             className="w-full py-3 px-4 rounded-xl border border-slate-300 bg-white text-base focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent disabled:opacity-60"
           />
         </FormField>
 
-        {/* Tanggal */}
-        <FormField label="Tanggal" required error={errors.tanggal}>
+        {/* Tanggal Pengembalian */}
+        <FormField label="Tanggal Pengembalian" required error={errors.tanggal}>
           <input
             type="date"
             value={formData.tanggal}
@@ -158,7 +158,7 @@ export default function Pengembalian({ stokList = [], onBack, onSubmit, loading 
         </FormField>
 
         {/* Keterangan */}
-        <FormField label="Keterangan" error={errors.keterangan}>
+        <FormField label="Keterangan Pengembalian" error={errors.keterangan}>
           <textarea
             rows="3"
             value={formData.keterangan}
@@ -171,7 +171,7 @@ export default function Pengembalian({ stokList = [], onBack, onSubmit, loading 
 
         {/* Foto Bukti */}
         <FotoInput
-          label="Foto Bukti (Opsional)"
+          label="Foto Bukti Pengembalian (Opsional)"
           value={formData.foto}
           onChange={(val) => handleChange('foto', val)}
           disabled={loading}
@@ -180,7 +180,7 @@ export default function Pengembalian({ stokList = [], onBack, onSubmit, loading 
         {/* Tombol Simpan */}
         <div className="pt-2">
           <SubmitButton loading={loading} color="emerald" icon="save">
-            Simpan Data
+            Simpan Pengembalian
           </SubmitButton>
         </div>
       </FormCard>
