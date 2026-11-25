@@ -123,9 +123,11 @@ export default function App() {
             onClick={() => navigateTo('beranda')}
             className="flex items-center gap-2.5 text-left group"
           >
-            <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition">
-              <span className="material-symbols-outlined text-xl">inventory_2</span>
-            </div>
+            <img
+              src="/logo-iconnet.png"
+              alt="Iconnet"
+              className="w-8 h-8 sm:w-9 sm:h-9 object-contain group-hover:scale-105 transition"
+            />
             <div className="flex items-center gap-2">
               <span className="font-bold text-base text-slate-900 group-hover:text-blue-600 transition">
                 Pendataan Sovenir

@@ -51,10 +51,22 @@ export default function Beranda({ onNavigate, totalJenis = 0, isAdmin = false, o
   return (
     <div className="max-w-2xl mx-auto p-4 sm:p-6 space-y-6">
       {/* Header Aplikasi */}
-      <div className="text-center py-4 space-y-2">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/20 mb-1">
-          <span className="material-symbols-outlined text-3xl">inventory_2</span>
+      <div className="text-center py-4 space-y-3">
+        {/* Logo Danantara & PLN Icon Plus */}
+        <div className="flex items-center justify-center gap-5 sm:gap-8 py-1 mb-2">
+          <img
+            src="/logo-danantara.png"
+            alt="Danantara Indonesia"
+            className="h-10 sm:h-12 w-auto object-contain hover:opacity-90 transition"
+          />
+          <div className="h-7 w-px bg-slate-300"></div>
+          <img
+            src="/logo-pln-iconplus.png"
+            alt="PLN Icon Plus"
+            className="h-10 sm:h-12 w-auto object-contain drop-shadow-sm hover:opacity-90 transition"
+          />
         </div>
+
         <div className="flex items-center justify-center gap-2">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             Formulir Pengambilan Dan Pengeluaran Barang
