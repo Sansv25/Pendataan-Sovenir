@@ -136,12 +136,6 @@ export default function AdminLogin({ onLoginSuccess, onBack }) {
             )}
           </button>
         </form>
-
-        <div className="pt-2 border-t border-slate-100 text-center">
-          <p className="text-[11px] text-slate-400">
-            Kredensial bawaan: <code className="bg-slate-100 px-1.5 py-0.5 rounded text-slate-700 font-mono">admin</code> / <code className="bg-slate-100 px-1.5 py-0.5 rounded text-slate-700 font-mono">admin123</code>
-          </p>
-        </div>
       </div>
     </div>
   );
