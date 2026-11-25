@@ -2,7 +2,7 @@ import React from 'react';
 
 /**
  * Halaman Beranda
- * - Non-Admin: Hanya menampilkan 2 menu (Pengambilan & Pengembalian)
+ * - Non-Admin: Hanya menampilkan 2 menu (Pengambilan [Output] & Pengembalian [Input])
  * - Admin: Menampilkan 4 menu lengkap (+ Stok Masuk & Sisa Stok)
  */
 export default function Beranda({ onNavigate, totalJenis = 0, isAdmin = false, onLoginClick }) {
@@ -12,7 +12,7 @@ export default function Beranda({ onNavigate, totalJenis = 0, isAdmin = false, o
       id: 'pengambilan',
       title: 'Pengambilan Sovenir',
       desc: 'Catat pengeluaran atau pengambilan sovenir',
-      badge: 'Keluar',
+      badge: 'Output',
       iconName: 'output',
       iconBg: 'bg-blue-50 text-blue-600',
     },
@@ -20,7 +20,7 @@ export default function Beranda({ onNavigate, totalJenis = 0, isAdmin = false, o
       id: 'pengembalian',
       title: 'Pengembalian Sovenir',
       desc: 'Catat sovenir sisa event yang dikembalikan',
-      badge: 'Kembali',
+      badge: 'Input',
       iconName: 'input',
       iconBg: 'bg-emerald-50 text-emerald-600',
     },
@@ -57,7 +57,7 @@ export default function Beranda({ onNavigate, totalJenis = 0, isAdmin = false, o
         </div>
         <div className="flex items-center justify-center gap-2">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            Pendataan Sovenir
+            Formulir Pengambilan Dan Pengeluaran Barang
           </h1>
           {isAdmin && (
             <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
@@ -65,15 +65,15 @@ export default function Beranda({ onNavigate, totalJenis = 0, isAdmin = false, o
             </span>
           )}
         </div>
-        <p className="text-sm text-slate-500 max-w-sm mx-auto">
-          {isAdmin
-            ? 'Panel Admin: Akses penuh pencatatan, penambahan stok, dan kelola data sovenir'
-            : 'Pencatatan pengeluaran dan pengembalian sovenir kegiatan'}
-        </p>
+        {isAdmin && (
+          <p className="text-sm text-slate-500 max-w-sm mx-auto">
+            Panel Admin: Akses penuh pencatatan, penambahan stok, dan kelola data sovenir
+          </p>
+        )}
       </div>
 
       {/* Grid Menu */}
-      <div className={`grid grid-cols-1 ${visibleMenus.length > 2 ? 'sm:grid-cols-2' : 'sm:grid-cols-2'} gap-4`}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {visibleMenus.map((m) => (
           <button
             key={m.id}
@@ -85,7 +85,13 @@ export default function Beranda({ onNavigate, totalJenis = 0, isAdmin = false, o
               <div className={`p-3 rounded-xl ${m.iconBg} group-hover:scale-105 transition`}>
                 <span className="material-symbols-outlined text-2xl">{m.iconName}</span>
               </div>
-              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">
+              <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
+                m.badge === 'Output'
+                  ? 'bg-blue-100 text-blue-700'
+                  : m.badge === 'Input'
+                  ? 'bg-emerald-100 text-emerald-700'
+                  : 'bg-slate-100 text-slate-700'
+              }`}>
                 {m.badge}
               </span>
             </div>
