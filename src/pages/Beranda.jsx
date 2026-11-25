@@ -11,16 +11,16 @@ export default function Beranda({ onNavigate, totalJenis = 0, isAdmin = false, o
     {
       id: 'pengambilan',
       title: 'Pengambilan Sovenir',
-      desc: 'Catat pengeluaran atau pengambilan sovenir',
-      badge: 'Output',
+      desc: 'Catat pengambilan sovenir kegiatan',
+      badge: 'Keluar',
       iconName: 'output',
       iconBg: 'bg-blue-50 text-blue-600',
     },
     {
       id: 'pengembalian',
-      title: 'Pengembalian Sovenir',
-      desc: 'Catat sovenir sisa event yang dikembalikan',
-      badge: 'Input',
+      title: 'Pengeluaran Sovenir',
+      desc: 'Catat pengeluaran atau pengembalian sovenir',
+      badge: 'Masuk',
       iconName: 'input',
       iconBg: 'bg-emerald-50 text-emerald-600',
     },
@@ -98,9 +98,9 @@ export default function Beranda({ onNavigate, totalJenis = 0, isAdmin = false, o
                 <span className="material-symbols-outlined text-2xl">{m.iconName}</span>
               </div>
               <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
-                m.badge === 'Output'
+                m.badge === 'Keluar' || m.badge === 'Output'
                   ? 'bg-blue-100 text-blue-700'
-                  : m.badge === 'Input'
+                  : m.badge === 'Masuk' || m.badge === 'Input'
                   ? 'bg-emerald-100 text-emerald-700'
                   : 'bg-slate-100 text-slate-700'
               }`}>
